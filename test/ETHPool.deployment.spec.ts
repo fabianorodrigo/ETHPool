@@ -10,10 +10,21 @@ describe("ETHPool", function () {
   const ETHPoolFixture = deployETHPoolFixture;
 
   describe("Deployment", function () {
-    it("Should set the right owner", async function () {
-      const {ethPool, owner} = await loadFixture(ETHPoolFixture);
+    it("Should set the default admin role to publisher account, and the team role admin to the specified manager", async function () {
+      const {ethPool, owner, manager, teamMember, teamMemberB} =
+        await loadFixture(ETHPoolFixture);
 
-      expect(await ethPool.owner()).to.equal(owner.address);
+      const DEFAULT_ADMIN_ROLE = await ethPool.DEFAULT_ADMIN_ROLE();
+      const TEAM_ROLE = await ethPool.TEAM_ROLE();
+      const TEAM_ADMIN_ROLE = await ethPool.getRoleAdmin(TEAM_ROLE);
+
+      expect(await ethPool.hasRole(DEFAULT_ADMIN_ROLE, owner.address)).to.be
+        .true;
+      expect(await ethPool.hasRole(TEAM_ADMIN_ROLE, owner.address)).to.be.true;
+      expect(await ethPool.hasRole(TEAM_ADMIN_ROLE, manager.address)).to.be
+        .true;
+      expect(await ethPool.hasRole(TEAM_ROLE, teamMember.address)).to.be.true;
+      expect(await ethPool.hasRole(TEAM_ROLE, teamMemberB.address)).to.be.true;
     });
 
     // it("Should receive and store the funds to lock", async function () {

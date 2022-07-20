@@ -49,6 +49,80 @@ describe("ETHPool", function () {
       });
     });
     describe("State", function () {
+      it("Should the user withdraw only the deposited value when there is no rewards after its deposit", async function () {
+        const {ethPool, accountA, accountB, accountD, teamMember} =
+          await loadFixture(ETHPoolFixture);
+
+        ///// DEPOSITS FROM accountB AND accountA
+        const randomAmountA = UtilsTest.getRandomAmount();
+        const randomAmountB = UtilsTest.getRandomAmount();
+
+        await accountB.sendTransaction({
+          to: ethPool.address,
+          value: randomAmountB,
+        });
+        await accountA.sendTransaction({
+          to: ethPool.address,
+          value: randomAmountA,
+        });
+
+        const initialPoolBalance = randomAmountA + randomAmountB;
+
+        // DEPOSIT REWARD FROM teamMember
+        const randomReward = UtilsTest.getRandomAmount();
+        await ethPool.connect(teamMember).depositReward({value: randomReward});
+
+        ///// DEPOSIT FROM accountD
+        const randomAmountD = UtilsTest.getRandomAmount();
+        await accountD.sendTransaction({
+          to: ethPool.address,
+          value: randomAmountD,
+        });
+
+        // users balance
+        // User balance (Division always truncates, it just maps to the DIV opcode of the EVM)
+        const balanceA =
+          randomAmountA +
+          Math.floor((randomReward * randomAmountA) / initialPoolBalance);
+        const balanceB =
+          randomAmountB +
+          Math.floor((randomReward * randomAmountB) / initialPoolBalance);
+        expect(await ethPool.balances(accountA.address)).to.be.equal(balanceA);
+        expect(await ethPool.balances(accountB.address)).to.be.equal(balanceB);
+        expect(await ethPool.balances(accountD.address)).to.be.equal(
+          randomAmountD
+        );
+
+        ////// WITHDRAWS
+        const ethersABeforeWithdraw = await accountA.getBalance();
+        const ethersBBeforeWithdraw = await accountB.getBalance();
+        const ethersDBeforeWithdraw = await accountD.getBalance();
+
+        const txA = await ethPool.connect(accountA).withdraw();
+        const receiptA = await txA.wait();
+        const txB = await ethPool.connect(accountB).withdraw();
+        const receiptB = await txB.wait();
+        const txD = await ethPool.connect(accountD).withdraw();
+        const receiptD = await txD.wait();
+
+        // Final ETH balances should be the previous balance, plus the total withdrawal, minus network fees
+        expect(await accountA.getBalance()).to.be.equal(
+          ethersABeforeWithdraw
+            .add(balanceA)
+            .sub(receiptA.cumulativeGasUsed.mul(receiptA.effectiveGasPrice))
+        );
+        expect(await accountB.getBalance()).to.be.equal(
+          ethersBBeforeWithdraw
+            .add(balanceB)
+            .sub(receiptB.cumulativeGasUsed.mul(receiptB.effectiveGasPrice))
+        );
+        expect(await accountD.getBalance()).to.be.equal(
+          ethersDBeforeWithdraw
+            .add(randomAmountD)
+            .sub(receiptD.cumulativeGasUsed.mul(receiptD.effectiveGasPrice))
+        );
+      });
+
       it("Should update pool balance, user balance, active users array and activeUsersPosition when there is one unique active user", async function () {
         const {ethPool, accountC} = await loadFixture(ETHPoolFixture);
 

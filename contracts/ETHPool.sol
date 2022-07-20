@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
  * @title Pool of Ethers
@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * Users are able to take out their deposits along with their portion of rewards at any time.
  * New rewards are deposited into the pool by the ETHPool team each week
  */
-contract ETHPool is Ownable {
+contract ETHPool is AccessControl {
     error InvalidAmount();
     error ZeroBalance();
     error NoActiveUsers();
@@ -27,6 +27,16 @@ contract ETHPool is Ownable {
     mapping(address => uint) public balances;
     // mapping from user address to its index+1 in the {activeUsers} array
     mapping(address => uint) public activeUsersPosition;
+
+    // Create a new role identifier for the team role
+    bytes32 public constant TEAM_ROLE = keccak256("TEAM");
+
+    constructor(address _manager) {
+        // Grant the admin role for all roles to a the publisher account
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        // Each role has an associated admin role. Set the admin role for TEAM role to a specific account
+        _setupRole(getRoleAdmin(TEAM_ROLE), _manager);
+    }
 
     /**
      * @notice Receive deposits from users. This function is called by the user when they deposit ETH to the pool.
@@ -57,7 +67,7 @@ contract ETHPool is Ownable {
      *
      * @custom:error InvalidAmount: When msg.value is 0.
      */
-    function depositReward() external payable onlyOwner {
+    function depositReward() external payable onlyRole(TEAM_ROLE) {
         if (msg.value == 0) {
             revert InvalidAmount();
         }

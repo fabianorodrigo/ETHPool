@@ -12,36 +12,42 @@ describe("ETHPool", function () {
   describe("Rewards", function () {
     describe("Validations", function () {
       it("Should revert if reward is 0 ETH", async function () {
-        const {ethPool, owner} = await loadFixture(ETHPoolFixture);
+        const {ethPool, teamMember} = await loadFixture(ETHPoolFixture);
 
         await expect(
-          ethPool.connect(owner).depositReward({
+          ethPool.connect(teamMember).depositReward({
             value: ethers.constants.Zero,
           })
         ).to.be.revertedWithCustomError(ethPool, "InvalidAmount");
       });
       it("Should revert if there is no active users in the pool", async function () {
-        const {ethPool, owner} = await loadFixture(ETHPoolFixture);
+        const {ethPool, teamMember} = await loadFixture(ETHPoolFixture);
         const randomAmount = UtilsTest.getRandomAmount();
         await expect(
-          ethPool.connect(owner).depositReward({
+          ethPool.connect(teamMember).depositReward({
             value: randomAmount,
           })
         ).to.be.revertedWithCustomError(ethPool, "NoActiveUsers");
       });
-      it("Should revert if some account different from owner try to send reward", async function () {
-        const {ethPool, accountA} = await loadFixture(ETHPoolFixture);
+      it("Should revert if some account without team role try to send reward", async function () {
+        const {ethPool, accountA, TEAM_ROLE} = await loadFixture(
+          ETHPoolFixture
+        );
 
         await expect(
           ethPool.connect(accountA).depositReward({
             value: ethers.constants.One,
           })
-        ).to.be.revertedWith("Ownable: caller is not the owner");
+        ).to.be.revertedWith(
+          `AccessControl: account ${accountA.address.toLowerCase()} is missing role ${TEAM_ROLE}`
+        );
       });
     });
     describe("Events", function () {
       it("Should emit an event on RewardDeposit", async function () {
-        const {ethPool, owner, accountD} = await loadFixture(ETHPoolFixture);
+        const {ethPool, teamMember, accountD} = await loadFixture(
+          ETHPoolFixture
+        );
 
         await accountD.sendTransaction({
           to: ethPool.address,
@@ -50,7 +56,7 @@ describe("ETHPool", function () {
 
         const randomAmount = UtilsTest.getRandomAmount();
         await expect(
-          ethPool.connect(owner).depositReward({
+          ethPool.connect(teamMember).depositReward({
             value: randomAmount,
           })
         )
@@ -60,7 +66,9 @@ describe("ETHPool", function () {
     });
     describe("State", function () {
       it("Should update pool balance and user balance with all reward when there is one unique active user ", async function () {
-        const {ethPool, owner, accountC} = await loadFixture(ETHPoolFixture);
+        const {ethPool, teamMember, accountC} = await loadFixture(
+          ETHPoolFixture
+        );
 
         const randomDeposit = UtilsTest.getRandomAmount();
         await accountC.sendTransaction({
@@ -69,7 +77,7 @@ describe("ETHPool", function () {
         });
 
         const randomReward = UtilsTest.getRandomAmount();
-        await ethPool.connect(owner).depositReward({
+        await ethPool.connect(teamMember).depositReward({
           value: randomReward,
         });
 
@@ -83,7 +91,7 @@ describe("ETHPool", function () {
         );
       });
       it("Should update pool balance and users balance with equal rewards when all active users have deposited the same amount", async function () {
-        const {ethPool, owner, accountA, accountB, accountC} =
+        const {ethPool, teamMember, accountA, accountB, accountC} =
           await loadFixture(ETHPoolFixture);
 
         const randomDeposit = UtilsTest.getRandomAmount();
@@ -101,7 +109,7 @@ describe("ETHPool", function () {
         });
 
         const randomReward = UtilsTest.getRandomAmount();
-        await ethPool.connect(owner).depositReward({
+        await ethPool.connect(teamMember).depositReward({
           value: randomReward,
         });
 
@@ -121,7 +129,7 @@ describe("ETHPool", function () {
         );
       });
       it("Should update pool balance and users balance with proportional rewards when active users have deposited different amounts", async function () {
-        const {ethPool, owner, accountD, accountB, accountC} =
+        const {ethPool, teamMember, accountD, accountB, accountC} =
           await loadFixture(ETHPoolFixture);
 
         const randomDepositC = UtilsTest.getRandomAmount();
@@ -141,7 +149,7 @@ describe("ETHPool", function () {
         });
 
         const randomReward = UtilsTest.getRandomAmount();
-        await ethPool.connect(owner).depositReward({
+        await ethPool.connect(teamMember).depositReward({
           value: randomReward,
         });
 
@@ -165,6 +173,22 @@ describe("ETHPool", function () {
           randomDepositD +
             Math.floor((randomReward * randomDepositD) / initialPoolBalance)
         );
+      });
+      it("Should allow any account to send reward after associate it with the TEAM role", async function () {
+        const {ethPool, accountA, accountD, manager, TEAM_ROLE} =
+          await loadFixture(ETHPoolFixture);
+
+        await ethPool.connect(manager).grantRole(TEAM_ROLE, accountA.address);
+
+        await accountD.sendTransaction({
+          to: ethPool.address,
+          value: ethers.constants.Two,
+        });
+
+        const randomAmount = UtilsTest.getRandomAmount();
+        await ethPool.connect(accountA).depositReward({
+          value: randomAmount,
+        });
       });
     });
   });
