@@ -1,13 +1,12 @@
-# Sample Hardhat Project
+# ETHPool Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This project is part of Exclusible hiring process technical challenge.
 
-Try running some of the following tasks:
+ETHPool provides a service where people can deposit ETH and they will receive weekly rewards. Users must be able to take out their deposits along with their portion of rewards at any time. New rewards are deposited manually into the pool by the ETHPool team each week using a contract function.
 
 ```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
+npm run build
+npm test
 npx hardhat node
 npx hardhat run scripts/deploy.ts
 ```
