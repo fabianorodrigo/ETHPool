@@ -4,7 +4,8 @@
     "clean": "npx hardhat clean",
     "build": "npx hardhat compile",
     "test": "npx hardhat test",
-    "coverage": "npx hardhat coverage"
+    "coverage": "npx hardhat coverage",
+    "slither": "slither .  --exclude-dependencies  --exclude-informational"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",

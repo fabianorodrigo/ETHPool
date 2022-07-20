@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
  * @title Pool of Ethers
@@ -10,7 +11,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * Users are able to take out their deposits along with their portion of rewards at any time.
  * New rewards are deposited into the pool by the ETHPool team each week
  */
-contract ETHPool is AccessControl {
+contract ETHPool is AccessControl, ReentrancyGuard {
     error InvalidAmount();
     error ZeroBalance();
     error NoActiveUsers();
@@ -74,13 +75,14 @@ contract ETHPool is AccessControl {
         if (activeUsers.length == 0) {
             revert NoActiveUsers();
         }
+        uint256 rewardValue = msg.value;
         for (uint256 i = 0; i < activeUsers.length; i++) {
             balances[activeUsers[i]] +=
-                (msg.value * balances[activeUsers[i]]) /
+                (rewardValue * balances[activeUsers[i]]) /
                 poolBalance;
         }
-        poolBalance += msg.value;
-        emit RewardDeposit(msg.value);
+        poolBalance += rewardValue;
+        emit RewardDeposit(rewardValue);
     }
 
     /**
@@ -90,7 +92,7 @@ contract ETHPool is AccessControl {
      *  array and the {activeUsersIndex} mapping.
      * @custom:error ZeroBalance: When the msg.sender balance is zero
      */
-    function withdraw() external {
+    function withdraw() external nonReentrant {
         if (balances[msg.sender] <= 0) {
             revert ZeroBalance();
         }
@@ -99,10 +101,10 @@ contract ETHPool is AccessControl {
         poolBalance -= amount;
         // remove from the sender from active users
         removeUser(msg.sender);
+        emit Withdrawal(msg.sender, amount);
         // Not recommended to use transfer or send after EIP-1884 since it changes the cost of SLOAD
         (bool sent, ) = msg.sender.call{value: amount}("");
         require(sent);
-        emit Withdrawal(msg.sender, amount);
     }
 
     /**
