@@ -25,8 +25,8 @@ contract ETHPool is Ownable {
     address[] public activeUsers;
     // mapping from user address to its balance
     mapping(address => uint) public balances;
-    // mapping from user address to its index in the {activeUsers} array
-    mapping(address => uint) public activeUsersIndex;
+    // mapping from user address to its index+1 in the {activeUsers} array
+    mapping(address => uint) public activeUsersPosition;
 
     /**
      * @notice Receive deposits from users. This function is called by the user when they deposit ETH to the pool.
@@ -44,7 +44,7 @@ contract ETHPool is Ownable {
         // In this case, add it to the activeUsers array.
         if (balances[msg.sender] == 0) {
             activeUsers.push(msg.sender);
-            activeUsersIndex[msg.sender] = activeUsers.length - 1;
+            activeUsersPosition[msg.sender] = activeUsers.length;
         }
         balances[msg.sender] += msg.value;
         emit Deposit(msg.sender, msg.value);
@@ -75,6 +75,7 @@ contract ETHPool is Ownable {
 
     /**
      * @notice Withdraws the user's full balance along with all weekly rewards already received
+     *
      * @dev Set the balance of the user to 0, send it its balance, and remove it from the {activeUsers}
      *  array and the {activeUsersIndex} mapping.
      * @custom:error ZeroBalance: When the msg.sender balance is zero
@@ -85,6 +86,7 @@ contract ETHPool is Ownable {
         }
         uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;
+        poolBalance -= amount;
         // remove from the sender from active users
         removeUser(msg.sender);
         // Not recommended to use transfer or send after EIP-1884 since it changes the cost of SLOAD
@@ -94,21 +96,29 @@ contract ETHPool is Ownable {
     }
 
     /**
-     * @notice remove the user from active users
-     * @dev move the last element of {activeUsers} to the position of {user}, pop the last element of {activeUsers},
-     *   update the {activeUsersIndex[lastElementAddress]} to the position that was from {user} and delete
-     *   the reference of user in the activeUsersIndex[user] (Actually sets to default, zero)
+     * @notice remove {_user} from active users
+     *
+     * @dev move the last element of {activeUsers} to the position of {user},
+     *  update the {activeUsersIndex[lastElementAddress]} to the position that was from {user},
+     *  pop the last element of {activeUsers}, and delete the reference of user in the
+     *  activeUsersIndex[user] (Actually sets to default, zero)
      *
      * @param _user The user address to remove
      */
     function removeUser(address _user) private {
-        uint256 idx = activeUsersIndex[_user];
-        // copy the last element to the removed user's position
-        // and pop the last element
-        activeUsers[idx] = activeUsers[activeUsers.length - 1];
+        if (activeUsers.length > 1) {
+            uint256 idx = activeUsersPosition[_user] - 1;
+            // Move is necessary only if it's not the last element
+            if (idx != activeUsers.length - 1) {
+                // copy the last element to the removed user's position
+                activeUsers[idx] = activeUsers[activeUsers.length - 1];
+                // updates the new index of the moved user
+                activeUsersPosition[activeUsers[idx]] = idx + 1;
+            }
+        }
+        // pop the last user from the array
         activeUsers.pop();
         // update the mapping activeUsersIndex
-        activeUsersIndex[activeUsers[idx]] = idx;
-        delete activeUsersIndex[_user];
+        delete activeUsersPosition[_user];
     }
 }

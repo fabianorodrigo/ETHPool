@@ -38,7 +38,7 @@ describe("ETHPool", function () {
       });
     });
     describe("State", function () {
-      it("Should update pool balance, user balance, active users array and activeUser index in active users array ", async function () {
+      it("Should update pool balance, user balance, active users array and activeUsers position in active users array ", async function () {
         const {ethPool, accountA, accountB, accountC, accountD} =
           await loadFixture(ETHPoolFixture);
 
@@ -75,12 +75,18 @@ describe("ETHPool", function () {
         expect(await ethPool.activeUsers(0)).to.be.equal(accountB.address);
         expect(await ethPool.activeUsers(1)).to.be.equal(accountA.address);
         await expect(ethPool.activeUsers(2)).to.be.revertedWithoutReason;
-        // activeUsersIndex
-        expect(await ethPool.activeUsersIndex(accountB.address)).to.be.equal(
+        // activeUsersPosition
+        expect(await ethPool.activeUsersPosition(accountB.address)).to.be.equal(
+          ethers.constants.One
+        );
+        expect(await ethPool.activeUsersPosition(accountA.address)).to.be.equal(
+          ethers.constants.Two
+        );
+        expect(await ethPool.activeUsersPosition(accountC.address)).to.be.equal(
           ethers.constants.Zero
         );
-        expect(await ethPool.activeUsersIndex(accountA.address)).to.be.equal(
-          ethers.constants.One
+        expect(await ethPool.activeUsersPosition(accountD.address)).to.be.equal(
+          ethers.constants.Zero
         );
 
         ///// SECOND DEPOSIT FROM accountB AND FIRST from accountD
@@ -117,81 +123,20 @@ describe("ETHPool", function () {
         expect(await ethPool.activeUsers(1)).to.be.equal(accountA.address);
         expect(await ethPool.activeUsers(2)).to.be.equal(accountD.address);
         await expect(ethPool.activeUsers(3)).to.be.revertedWithoutReason;
-        // activeUsersIndex
-        expect(await ethPool.activeUsersIndex(accountB.address)).to.be.equal(
-          ethers.constants.Zero
-        );
-        expect(await ethPool.activeUsersIndex(accountA.address)).to.be.equal(
+        // activeUsersPosition
+        expect(await ethPool.activeUsersPosition(accountB.address)).to.be.equal(
           ethers.constants.One
         );
-        expect(await ethPool.activeUsersIndex(accountD.address)).to.be.equal(
+        expect(await ethPool.activeUsersPosition(accountA.address)).to.be.equal(
           ethers.constants.Two
+        );
+        expect(await ethPool.activeUsersPosition(accountD.address)).to.be.equal(
+          3
+        );
+        expect(await ethPool.activeUsersPosition(accountC.address)).to.be.equal(
+          ethers.constants.Zero
         );
       });
     });
   });
-
-  // describe("Withdrawals", function () {
-  //   describe("Validations", function () {
-  //     it("Should revert with the right error if called too soon", async function () {
-  //       const {ethPool} = await loadFixture(ETHPoolFixture);
-
-  //       // await expect(ethPool.withdraw()).to.be.revertedWith(
-  //       //   "You can't withdraw yet"
-  //       // );
-  //     });
-
-  //     it("Should revert with the right error if called from another account", async function () {
-  //       const {ethPool, unlockTime, otherAccount} = await loadFixture(
-  //         ETHPoolFixture
-  //       );
-
-  //       // We can increase the time in Hardhat Network
-  //       await time.increaseTo(unlockTime);
-
-  //       // We use lock.connect() to send a transaction from another account
-  //       await expect(
-  //         ethPool.connect(otherAccount).withdraw()
-  //       ).to.be.revertedWith("You aren't the owner");
-  //     });
-
-  //     it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
-  //       const {ethPool, unlockTime} = await loadFixture(ETHPoolFixture);
-
-  //       // Transactions are sent using the first signer by default
-  //       await time.increaseTo(unlockTime);
-
-  //       await expect(ethPool.withdraw()).not.to.be.reverted;
-  //     });
-  //   });
-
-  //   describe("Events", function () {
-  //     it("Should emit an event on withdrawals", async function () {
-  //       const {ethPool, unlockTime, lockedAmount} = await loadFixture(
-  //         ETHPoolFixture
-  //       );
-
-  //       await time.increaseTo(unlockTime);
-
-  //       await expect(ethPool.withdraw())
-  //         .to.emit(ethPool, "Withdrawal")
-  //         .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
-  //     });
-  //   });
-
-  //   describe("Transfers", function () {
-  //     it("Should transfer the funds to the owner", async function () {
-  //       const {ethPool, unlockTime, lockedAmount, owner} = await loadFixture(
-  //         deployOneYearLockFixture
-  //       );
-
-  //       await time.increaseTo(unlockTime);
-
-  //       await expect(ethPool.withdraw()).to.changeEtherBalances(
-  //         [owner, ethPool],
-  //         [lockedAmount, -lockedAmount]
-  //       );
-  //     });
-  //   });
-  // });
 });
