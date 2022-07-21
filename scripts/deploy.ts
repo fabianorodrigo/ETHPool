@@ -1,18 +1,17 @@
-import { ethers } from "hardhat";
+import {ethers} from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const [deployer, manager, teamMember] = await ethers.getSigners();
+  const ETHPoolFactory = await ethers.getContractFactory("ETHPool");
+  const ethPool = await ETHPoolFactory.deploy(manager.address);
+  await ethPool.deployed();
+  console.log(`ETHPool deployed to '${ethPool.address}'`);
+  console.log(`Admin: '${deployer.address}'`);
+  console.log(`Manager: '${manager.address}'`);
 
-  const lockedAmount = ethers.utils.parseEther("1");
-
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
-
-  console.log("Lock with 1 ETH deployed to:", lock.address);
+  const TEAM_ROLE = await ethPool.TEAM_ROLE();
+  await ethPool.connect(deployer).grantRole(TEAM_ROLE, teamMember.address);
+  console.log(`Team member: '${teamMember.address}'`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
