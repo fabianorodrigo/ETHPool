@@ -147,10 +147,6 @@ contract ETHPoolUpgradeable is
         delete activeUsersPosition[_user];
     }
 
-    function jureba() external pure returns (bool) {
-        return true;
-    }
-
     /**
      * @notice Function required by UUPS proxy pattern
      */
