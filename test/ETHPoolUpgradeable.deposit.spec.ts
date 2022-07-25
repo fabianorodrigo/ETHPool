@@ -1,8 +1,11 @@
+import {ETHPoolUpgradeable__factory} from "./../typechain-types/factories/contracts/ETHPoolUpgradeable__factory";
 import {loadFixture} from "@nomicfoundation/hardhat-network-helpers";
 import {expect} from "chai";
-import {ethers} from "hardhat";
+import {ethers, network} from "hardhat";
 import {deployETHPoolUpgradeableFixture} from "./shared/fixtureUpgradeable";
 import {UtilsTest} from "./Utils";
+import {ETHPoolUpgradeable} from "../typechain-types";
+import {getImplementationAddress} from "@openzeppelin/upgrades-core";
 
 describe("ETHPoolUpgradeable", function () {
   // We use loadFixture to run this setup once, snapshot that state,
@@ -20,6 +23,26 @@ describe("ETHPoolUpgradeable", function () {
             value: ethers.constants.Zero,
           })
         ).to.be.revertedWithCustomError(ethPoolProxy, "InvalidAmount");
+      });
+
+      it(`Should revert if try to deposit direct to the implementation contract is spite of the proxy contract`, async function () {
+        const {ethPoolProxy, accountA} = await loadFixture(ETHPoolFixture);
+        const implementationAddress = await getImplementationAddress(
+          network.provider,
+          ethPoolProxy.address
+        );
+        const ETHPoolUpgradeableFactory: ETHPoolUpgradeable__factory =
+          await ethers.getContractFactory(`ETHPoolUpgradeable`);
+        const ethPool: ETHPoolUpgradeable = ETHPoolUpgradeableFactory.attach(
+          implementationAddress
+        );
+
+        await expect(
+          accountA.sendTransaction({
+            to: implementationAddress,
+            value: ethers.constants.Zero,
+          })
+        ).to.be.revertedWith("Function must be called through delegatecall");
       });
     });
     describe("Events", function () {

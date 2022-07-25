@@ -1,6 +1,11 @@
 import {loadFixture} from "@nomicfoundation/hardhat-network-helpers";
+import {getImplementationAddress} from "@openzeppelin/upgrades-core";
 import {expect} from "chai";
-import {ethers} from "hardhat";
+import {ethers, network} from "hardhat";
+import {
+  ETHPoolUpgradeable,
+  ETHPoolUpgradeable__factory,
+} from "../typechain-types";
 import {deployETHPoolUpgradeableFixture} from "./shared/fixtureUpgradeable";
 import {UtilsTest} from "./Utils";
 
@@ -32,6 +37,22 @@ describe("ETHPoolUpgradeable", function () {
         await expect(
           ethPoolProxy.connect(accountA).withdraw()
         ).to.be.revertedWithCustomError(ethPoolProxy, "ZeroBalance");
+      });
+      it(`Should revert if try to withdraw direct from the implementation contract is spite of the proxy contract`, async function () {
+        const {ethPoolProxy, accountA} = await loadFixture(ETHPoolFixture);
+        const implementationAddress = await getImplementationAddress(
+          network.provider,
+          ethPoolProxy.address
+        );
+        const ETHPoolUpgradeableFactory: ETHPoolUpgradeable__factory =
+          await ethers.getContractFactory(`ETHPoolUpgradeable`);
+        const ethPool: ETHPoolUpgradeable = ETHPoolUpgradeableFactory.attach(
+          implementationAddress
+        );
+
+        await expect(ethPool.connect(accountA).withdraw()).to.be.revertedWith(
+          "Function must be called through delegatecall"
+        );
       });
     });
     describe("Events", function () {

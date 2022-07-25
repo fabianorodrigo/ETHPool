@@ -54,12 +54,13 @@ contract ETHPoolUpgradeable is
 
     /**
      * @notice Receive deposits from users. This function is called by the user when they deposit ETH to the pool.
+     *
      * @dev If the user has no balance, it is added to the {activeUsers} array and to the {activeUsersIndex} mapping.
      * In any case, the {balances} mapping is updated with the new balance of the user (previous + msg.value).
      *
      * @custom:error InvalidAmount: When msg.value is 0.
      */
-    receive() external payable {
+    receive() external payable onlyProxy {
         if (msg.value == 0) {
             revert InvalidAmount();
         }
@@ -77,11 +78,12 @@ contract ETHPoolUpgradeable is
     /**
      * @notice Execute reward deposits from the Team and split the value proportionally between the active users. The
      *  rewards previously received and not withdrawn are considered in the users proportion
-     * @dev Interacts with the {activeUsers} and update {balances} mapping with the new previous balance plus the proportional reward.
+     *
+     * @dev Iterates at {activeUsers} and update {balances} mapping with the new previous balance plus the proportional reward.
      *
      * @custom:error InvalidAmount: When msg.value is 0.
      */
-    function depositReward() external payable onlyRole(TEAM_ROLE) {
+    function depositReward() external payable onlyProxy onlyRole(TEAM_ROLE) {
         if (msg.value == 0) {
             revert InvalidAmount();
         }
@@ -105,7 +107,7 @@ contract ETHPoolUpgradeable is
      *  array and the {activeUsersIndex} mapping.
      * @custom:error ZeroBalance: When the msg.sender balance is zero
      */
-    function withdraw() external nonReentrant {
+    function withdraw() external onlyProxy nonReentrant {
         if (balances[msg.sender] <= 0) {
             revert ZeroBalance();
         }
