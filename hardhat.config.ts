@@ -1,7 +1,6 @@
 import {HardhatUserConfig} from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "solidity-coverage";
-import "hardhat-gas-reporter";
 import "@openzeppelin/hardhat-upgrades";
 
 const config: HardhatUserConfig = {
@@ -11,11 +10,6 @@ const config: HardhatUserConfig = {
     reporterOptions: {
       configFile: "./mocha-reporter-config.json",
     },
-  },
-  gasReporter: {
-    showTimeSpent: true,
-    //outputFile: "reports/eth-gas-reporter.txt",
-    enabled: true,
   },
 };
 
