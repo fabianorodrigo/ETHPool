@@ -141,7 +141,7 @@ describe("ETHPool", function () {
           ethers.constants.Zero
         );
         // Active users array
-        await expect(ethPool.activeUsers(0)).to.be.revertedWithoutReason;
+        await expect(ethPool.activeUsers(0)).to.be.revertedWithoutReason();
         // activeUsersPosition
         expect(await ethPool.activeUsersPosition(accountC.address)).to.be.equal(
           ethers.constants.Zero
@@ -192,7 +192,7 @@ describe("ETHPool", function () {
         // Active users array
         expect(await ethPool.activeUsers(0)).to.be.equal(accountC.address);
         expect(await ethPool.activeUsers(1)).to.be.equal(accountB.address);
-        await expect(ethPool.activeUsers(2)).to.be.revertedWithoutReason;
+        await expect(ethPool.activeUsers(2)).to.be.revertedWithoutReason();
         // activeUsersPosition
         expect(await ethPool.activeUsersPosition(accountA.address)).to.be.equal(
           ethers.constants.Zero
@@ -252,7 +252,7 @@ describe("ETHPool", function () {
         // Active users array
         expect(await ethPool.activeUsers(0)).to.be.equal(accountA.address);
         expect(await ethPool.activeUsers(1)).to.be.equal(accountB.address);
-        await expect(ethPool.activeUsers(2)).to.be.revertedWithoutReason;
+        await expect(ethPool.activeUsers(2)).to.be.revertedWithoutReason();
         // activeUsersPosition
         expect(await ethPool.activeUsersPosition(accountA.address)).to.be.equal(
           ethers.constants.One
@@ -312,7 +312,7 @@ describe("ETHPool", function () {
         // Active users array
         expect(await ethPool.activeUsers(0)).to.be.equal(accountA.address);
         expect(await ethPool.activeUsers(1)).to.be.equal(accountC.address);
-        await expect(ethPool.activeUsers(2)).to.be.revertedWithoutReason;
+        await expect(ethPool.activeUsers(2)).to.be.revertedWithoutReason();
         // activeUsersPosition
         expect(await ethPool.activeUsersPosition(accountA.address)).to.be.equal(
           ethers.constants.One

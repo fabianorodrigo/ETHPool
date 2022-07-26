@@ -97,7 +97,7 @@ describe("ETHPoolUpgradeable", function () {
         // Active users array
         expect(await ethPoolProxy.activeUsers(0)).to.be.equal(accountB.address);
         expect(await ethPoolProxy.activeUsers(1)).to.be.equal(accountA.address);
-        await expect(ethPoolProxy.activeUsers(2)).to.be.revertedWithoutReason;
+        await expect(ethPoolProxy.activeUsers(2)).to.be.revertedWithoutReason();
         // activeUsersPosition
         expect(
           await ethPoolProxy.activeUsersPosition(accountB.address)
@@ -145,7 +145,7 @@ describe("ETHPoolUpgradeable", function () {
         expect(await ethPoolProxy.activeUsers(0)).to.be.equal(accountB.address);
         expect(await ethPoolProxy.activeUsers(1)).to.be.equal(accountA.address);
         expect(await ethPoolProxy.activeUsers(2)).to.be.equal(accountD.address);
-        await expect(ethPoolProxy.activeUsers(3)).to.be.revertedWithoutReason;
+        await expect(ethPoolProxy.activeUsers(3)).to.be.revertedWithoutReason();
         // activeUsersPosition
         expect(
           await ethPoolProxy.activeUsersPosition(accountB.address)
