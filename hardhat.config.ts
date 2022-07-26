@@ -16,7 +16,7 @@ const config: HardhatUserConfig = {
     currency: "EUR",
     coinmarketcap: process.env.COINMARKETCAP_API_TOKEN,
     showTimeSpent: true,
-    outputFile: "reports/eth-gas-reporter.txt",
+    //outputFile: "reports/eth-gas-reporter.txt",
     enabled: true,
   },
 };
