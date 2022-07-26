@@ -5,7 +5,8 @@
     "build": "npx hardhat compile",
     "test": "npx hardhat test",
     "coverage": "npx hardhat coverage",
-    "slither": "slither .  --exclude-dependencies  --exclude-informational"
+    "slither": "slither .  --exclude-dependencies  --exclude-informational",
+    "deploy": "npx hardhat run --network rinkeby scripts/deploy.ts"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
@@ -15,7 +16,8 @@
     "hardhat": "^2.10.1",
     "mocha-junit-reporter": "^2.0.2",
     "mocha-multi-reporters": "^1.5.1",
-    "solidity-coverage": "^0.7.21"
+    "solidity-coverage": "^0.7.21",
+    "dotenv": "^16.0.1"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.1",
