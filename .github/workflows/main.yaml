@@ -2,9 +2,6 @@ name: ETHPool CI/CD
 
 on:
   [push]
-  # push:
-  #   paths:
-  #     - "backend-hardhat/**"
 env:
   NETWORK: $NETWORK
   RPC_URL_ZNX_TESTNET: $RPC_URL_ZNX_TESTNET

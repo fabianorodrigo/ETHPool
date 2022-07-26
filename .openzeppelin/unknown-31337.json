@@ -8,14 +8,14 @@
     },
     {
       "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
-      "txHash": "0x5b0904dced96bcfb4b375b570a921970705409387e240b35726c32d9f4514241",
+      "txHash": "0x9b777f2398171ff3c98fc2887afbb031a015cc4a169d98de8cd741399460bb63",
       "kind": "uups"
     }
   ],
   "impls": {
     "956d1411a1db2de5159dba6ce695d75f51e42739b65929e00a2a891645bb081e": {
       "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-      "txHash": "0xe35532b8df8ea69b3a9042b08bc33d9593c735804cf4eb599300318ac41edacc",
+      "txHash": "0x5dadb2db22f06ce4824e85c16273a6e5a2cca8cd734b7bc717e2ab97c81a79da",
       "layout": {
         "storage": [
           {
