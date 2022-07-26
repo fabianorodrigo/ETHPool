@@ -3,7 +3,7 @@
   "scripts": {
     "clean": "npx hardhat clean",
     "build": "npx hardhat compile",
-    "test": "npx hardhat test --verbose",
+    "test": "npx hardhat test",
     "coverage": "npx hardhat coverage",
     "slither": "slither .  --exclude-dependencies  --exclude-informational"
   },
