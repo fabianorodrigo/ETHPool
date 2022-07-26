@@ -71,13 +71,13 @@ jobs:
     name: Static Analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: slither
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run Slither
         uses: crytic/slither-action@v0.1.1
         id: slither
         continue-on-error: true
         with:
-          target: ./
           sarif: results.sarif
           # slither-config: .//slither.config.json
       - name: Upload SARIF file
