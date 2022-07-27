@@ -3,10 +3,10 @@ name: ETHPool CI/CD
 on:
   [push]
 env:
-  NETWORK: $NETWORK
-  RPC_URL_ZNX_TESTNET: $RPC_URL_ZNX_TESTNET
-  RPC_URL_ZNX_MAINNET: $RPC_URL_ZNX_MAINNET
-  MNEMONIC: $MNEMONIC
+  RINKEBY_ALCHEMY_API_KEY_URL: https://eth-rinkeby.alchemyapi.io/v2/<KEY>
+  ADMIN_PRIVATE_KEY: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+  MANAGER_PRIVATE_KEY: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+  TEAMMEMBER_PRIVATE_KEY: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
   ROPSTEN_URL: $ROPSTEN_URL
 jobs:
   build_test:
@@ -51,9 +51,6 @@ jobs:
         working-directory: ./
       - name: Run tests
         run: npm run test
-        working-directory: ./
-      - name: ls
-        run: ls -la
         working-directory: ./
       - name: Test Report
         uses: dorny/test-reporter@v1
