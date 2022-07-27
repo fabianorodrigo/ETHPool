@@ -6,7 +6,8 @@
     "test": "npx hardhat test",
     "coverage": "npx hardhat coverage",
     "slither": "slither .  --exclude-dependencies  --exclude-informational",
-    "deploy": "npx hardhat run --network rinkeby scripts/deploy.ts"
+    "deploy": "npx hardhat run --network rinkeby scripts/deploy.ts",
+    "deployUpgradeable": "npx hardhat run --network rinkeby scripts/deployUpgradeable.ts"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",

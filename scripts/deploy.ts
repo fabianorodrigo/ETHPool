@@ -1,5 +1,6 @@
-import {ethers, run} from "hardhat";
 import * as dotenv from "dotenv";
+import {ethers, run} from "hardhat";
+import {sleep} from "./sleep";
 dotenv.config({path: ".env"});
 require("@nomiclabs/hardhat-etherscan");
 
@@ -33,7 +34,3 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
