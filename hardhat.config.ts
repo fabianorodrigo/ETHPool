@@ -3,6 +3,7 @@ import "@openzeppelin/hardhat-upgrades";
 import {HardhatUserConfig} from "hardhat/config";
 import "solidity-coverage";
 import * as dotenv from "dotenv";
+import "./tasks/PoolBalance";
 
 dotenv.config();
 

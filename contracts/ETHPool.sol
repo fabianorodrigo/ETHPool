@@ -33,7 +33,7 @@ contract ETHPool is AccessControl, ReentrancyGuard {
     bytes32 public constant TEAM_ROLE = keccak256("TEAM");
 
     constructor(address _manager) {
-        // Grant the admin role for all roles to a the publisher account
+        // Grant the admin role for all roles to the publisher account
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         // Each role has an associated admin role. Set the admin role for TEAM role to a specific account
         _setupRole(getRoleAdmin(TEAM_ROLE), _manager);
