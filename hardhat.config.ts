@@ -4,6 +4,7 @@ import {HardhatUserConfig} from "hardhat/config";
 import "solidity-coverage";
 import * as dotenv from "dotenv";
 import "./tasks/PoolBalance";
+import "./tasks/ETHPoolUserBalance";
 
 dotenv.config();
 

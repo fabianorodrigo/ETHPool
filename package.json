@@ -9,7 +9,8 @@
     "deploy": "npx hardhat run --network rinkeby scripts/deploy.ts",
     "deployUpgradeable": "npx hardhat run --network rinkeby scripts/deployUpgradeable.ts",
     "ethPoolBalance": "npx hardhat poolBalance --address 0xBb796dbD5107C5B8409A3D291b77505C01Ee281D --network rinkeby",
-    "ethPoolUpgradeableBalance": "npx hardhat poolBalance --address 0x30168629686245047e7774F9A190c1824eFD52A0 --network rinkeby"
+    "ethPoolUpgradeableBalance": "npx hardhat poolBalance --address 0x30168629686245047e7774F9A190c1824eFD52A0 --network rinkeby",
+    "ethPoolUserBalance": "npx hardhat ETHPoolUserBalance --user $npm_config_user --network rinkeby"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",

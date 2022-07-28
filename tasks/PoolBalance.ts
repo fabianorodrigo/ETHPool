@@ -8,7 +8,5 @@ task("poolBalance", "Check the total amount of ETH held in the contract")
   )
   .setAction(async (taskArgs, hre) => {
     const balance = await hre.ethers.provider.getBalance(taskArgs.address);
-    console.log(`ETHPool balance: ${balance}`);
+    console.log(`Pool balance: ETH ${balance}`);
   });
-
-//
