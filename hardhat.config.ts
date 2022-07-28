@@ -5,6 +5,7 @@ import "solidity-coverage";
 import * as dotenv from "dotenv";
 import "./tasks/PoolBalance";
 import "./tasks/ETHPoolUserBalance";
+import "./tasks/ETHPoolUpgradeableUserBalance";
 
 dotenv.config();
 
