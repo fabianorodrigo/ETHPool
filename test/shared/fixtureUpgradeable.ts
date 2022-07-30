@@ -30,10 +30,11 @@ export async function deployETHPoolUpgradeableFixture() {
     }
   )) as ETHPoolUpgradeable;
 
+  const DEFAULT_ADMIN_ROLE = await ethPoolProxy.DEFAULT_ADMIN_ROLE();
+  const MANAGER_ROLE = await ethPoolProxy.MANAGER_ROLE();
   const TEAM_ROLE = await ethPoolProxy.TEAM_ROLE();
-  const TEAM_ADMIN_ROLE = await ethPoolProxy.getRoleAdmin(TEAM_ROLE);
 
-  await ethPoolProxy.connect(owner).grantRole(TEAM_ROLE, teamMember.address);
+  await ethPoolProxy.connect(manager).grantRole(TEAM_ROLE, teamMember.address);
   await ethPoolProxy.connect(manager).grantRole(TEAM_ROLE, teamMemberB.address);
 
   return {
@@ -47,7 +48,8 @@ export async function deployETHPoolUpgradeableFixture() {
     accountC,
     accountD,
     accountE,
-    TEAM_ADMIN_ROLE,
+    DEFAULT_ADMIN_ROLE,
+    MANAGER_ROLE,
     TEAM_ROLE,
   };
 }

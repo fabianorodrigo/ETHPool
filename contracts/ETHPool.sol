@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "hardhat/console.sol";
 
 /**
  * @title Pool of Ethers
@@ -20,7 +21,10 @@ contract ETHPool is AccessControl, ReentrancyGuard {
     event Withdrawal(address user, uint256 amount);
     event RewardDeposit(uint256 amount);
 
+    // ETH pool's balance
     uint256 public poolBalance;
+    // Remainder ETH reward
+    uint256 public remainderReward = 0;
 
     // List of active users, who are able to receive the next rewards
     address[] public activeUsers;
@@ -29,14 +33,18 @@ contract ETHPool is AccessControl, ReentrancyGuard {
     // mapping from user address to its index+1 in the {activeUsers} array
     mapping(address => uint) public activeUsersPosition;
 
+    // Create a new role identifier for the manager role
+    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER");
     // Create a new role identifier for the team role
     bytes32 public constant TEAM_ROLE = keccak256("TEAM");
 
     constructor(address _manager) {
-        // Grant the admin role for all roles to the publisher account
+        // Grant the admin role to the publisher account
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        // Each role has an associated admin role. Set the admin role for TEAM role to a specific account
-        _setupRole(getRoleAdmin(TEAM_ROLE), _manager);
+        // Grant the manager role to the informed manager account
+        _setupRole(MANAGER_ROLE, _manager);
+        // Sets MANAGER_ROLE as TEAM_ROLE's admin role.
+        _setRoleAdmin(TEAM_ROLE, MANAGER_ROLE);
     }
 
     /**
@@ -75,13 +83,16 @@ contract ETHPool is AccessControl, ReentrancyGuard {
         if (activeUsers.length == 0) {
             revert NoActiveUsers();
         }
-        uint256 rewardValue = msg.value;
+        uint256 rewardValue = msg.value + remainderReward;
+        uint256 distributedRewardValue = 0;
         for (uint256 i = 0; i < activeUsers.length; i++) {
-            balances[activeUsers[i]] +=
-                (rewardValue * balances[activeUsers[i]]) /
-                poolBalance;
+            uint256 v = (rewardValue * balances[activeUsers[i]]) /
+                (poolBalance - remainderReward);
+            balances[activeUsers[i]] += v;
+            distributedRewardValue += v;
         }
-        poolBalance += rewardValue;
+        poolBalance += msg.value;
+        remainderReward = rewardValue - distributedRewardValue;
         emit RewardDeposit(rewardValue);
     }
 

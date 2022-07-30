@@ -1,4 +1,5 @@
-import {ethers, upgrades, run} from "hardhat";
+import fs from "fs";
+import {ethers, run, upgrades} from "hardhat";
 import {sleep} from "./sleep";
 
 async function main() {
@@ -25,8 +26,18 @@ async function main() {
   console.log(`Manager: '${manager.address}'`);
 
   const TEAM_ROLE = await ethPoolProxy.TEAM_ROLE();
-  await ethPoolProxy.connect(admin).grantRole(TEAM_ROLE, teamMember.address);
+  await ethPoolProxy.connect(manager).grantRole(TEAM_ROLE, teamMember.address);
   console.log(`Team member: '${teamMember.address}'`);
+
+  fs.writeFileSync(
+    "scripts/EthPoolUpgradeable.json",
+    JSON.stringify({
+      proxyContract: ethPoolProxy.address,
+      admin: admin.address,
+      manager: manager.address,
+      teamMember: teamMember.address,
+    })
+  );
 
   console.log("Sleeping.....");
   // Wait for etherscan to notice that the contract has been deployed
