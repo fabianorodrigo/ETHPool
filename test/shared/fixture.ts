@@ -19,10 +19,11 @@ export async function deployETHPoolFixture() {
   const ETHPoolFactory = await ethers.getContractFactory("ETHPool");
   const ethPool = await ETHPoolFactory.deploy(manager.address);
 
+  const DEFAULT_ADMIN_ROLE = await ethPool.DEFAULT_ADMIN_ROLE();
+  const MANAGER_ROLE = await ethPool.MANAGER_ROLE();
   const TEAM_ROLE = await ethPool.TEAM_ROLE();
-  const TEAM_ADMIN_ROLE = await ethPool.getRoleAdmin(TEAM_ROLE);
 
-  await ethPool.connect(owner).grantRole(TEAM_ROLE, teamMember.address);
+  await ethPool.connect(manager).grantRole(TEAM_ROLE, teamMember.address);
   await ethPool.connect(manager).grantRole(TEAM_ROLE, teamMemberB.address);
 
   return {
@@ -36,7 +37,8 @@ export async function deployETHPoolFixture() {
     accountC,
     accountD,
     accountE,
-    TEAM_ADMIN_ROLE,
+    DEFAULT_ADMIN_ROLE,
+    MANAGER_ROLE,
     TEAM_ROLE,
   };
 }

@@ -29,14 +29,18 @@ contract ETHPool is AccessControl, ReentrancyGuard {
     // mapping from user address to its index+1 in the {activeUsers} array
     mapping(address => uint) public activeUsersPosition;
 
+    // Create a new role identifier for the manager role
+    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER");
     // Create a new role identifier for the team role
     bytes32 public constant TEAM_ROLE = keccak256("TEAM");
 
     constructor(address _manager) {
-        // Grant the admin role for all roles to the publisher account
+        // Grant the admin role to the publisher account
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        // Each role has an associated admin role. Set the admin role for TEAM role to a specific account
-        _setupRole(getRoleAdmin(TEAM_ROLE), _manager);
+        // Grant the manager role to the informed manager account
+        _setupRole(MANAGER_ROLE, _manager);
+        // Sets MANAGER_ROLE as TEAM_ROLE's admin role.
+        _setRoleAdmin(TEAM_ROLE, MANAGER_ROLE);
     }
 
     /**

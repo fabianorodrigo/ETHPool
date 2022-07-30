@@ -29,6 +29,28 @@ describe("ETHPool", function () {
           })
         ).to.be.revertedWithCustomError(ethPool, "NoActiveUsers");
       });
+      it("Should revert if the admin account try to send reward", async function () {
+        const {ethPool, owner, TEAM_ROLE} = await loadFixture(ETHPoolFixture);
+
+        await expect(
+          ethPool.connect(owner).depositReward({
+            value: ethers.constants.One,
+          })
+        ).to.be.revertedWith(
+          `AccessControl: account ${owner.address.toLowerCase()} is missing role ${TEAM_ROLE}`
+        );
+      });
+      it("Should revert if a manager account try to send reward", async function () {
+        const {ethPool, manager, TEAM_ROLE} = await loadFixture(ETHPoolFixture);
+
+        await expect(
+          ethPool.connect(manager).depositReward({
+            value: ethers.constants.One,
+          })
+        ).to.be.revertedWith(
+          `AccessControl: account ${manager.address.toLowerCase()} is missing role ${TEAM_ROLE}`
+        );
+      });
       it("Should revert if some account without team role try to send reward", async function () {
         const {ethPool, accountA, TEAM_ROLE} = await loadFixture(
           ETHPoolFixture
