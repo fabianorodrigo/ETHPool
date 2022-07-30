@@ -28,7 +28,10 @@ contract ETHPoolUpgradeable is
     event Withdrawal(address user, uint256 amount);
     event RewardDeposit(uint256 amount);
 
+    // ETH pool's balance
     uint256 public poolBalance;
+    // Remainder ETH reward
+    uint256 public remainderReward;
 
     // List of active users, who are able to receive the next rewards
     address[] public activeUsers;
@@ -94,13 +97,16 @@ contract ETHPoolUpgradeable is
         if (activeUsers.length == 0) {
             revert NoActiveUsers();
         }
-        uint256 rewardValue = msg.value;
+        uint256 rewardValue = msg.value + remainderReward;
+        uint256 distributedRewardValue = 0;
         for (uint256 i = 0; i < activeUsers.length; i++) {
-            balances[activeUsers[i]] +=
-                (rewardValue * balances[activeUsers[i]]) /
-                poolBalance;
+            uint256 v = (rewardValue * balances[activeUsers[i]]) /
+                (poolBalance - remainderReward);
+            balances[activeUsers[i]] += v;
+            distributedRewardValue += v;
         }
-        poolBalance += rewardValue;
+        poolBalance += msg.value;
+        remainderReward = rewardValue - distributedRewardValue;
         emit RewardDeposit(rewardValue);
     }
 

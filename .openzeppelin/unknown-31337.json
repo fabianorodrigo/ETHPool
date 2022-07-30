@@ -198,14 +198,14 @@
     },
     {
       "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-      "txHash": "0xeb530d4b1c4f7e6f30ad3ea87507864ce44ee8fdffa7761394ac62f168532c94",
+      "txHash": "0x00662141c7cfc01f0d63a3dbb695d3964051f13f73d75de8bb274e04e5fb35bf",
       "kind": "uups"
     }
   ],
   "impls": {
-    "fee0d17d2f382c6e5c4272b5ad7440686f02de703bbccb61a065587a059ed682": {
+    "df29b89d941bb31d4ece0cbda0158acb75515d69bbdaf0fa1a92fa7a8942650b": {
       "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-      "txHash": "0x49109705d632ad11253f8f0444418df2cbbebeeeb1ade29731e22807d6d39fb8",
+      "txHash": "0x65e2e162ba7beccbf9abccd4228bd17d4e5eb916fdd8f2ec5cb8c05470d39fd7",
       "layout": {
         "storage": [
           {
@@ -295,31 +295,39 @@
             "slot": "301",
             "type": "t_uint256",
             "contract": "ETHPoolUpgradeable",
-            "src": "contracts/ETHPoolUpgradeable.sol:31"
+            "src": "contracts/ETHPoolUpgradeable.sol:32"
           },
           {
-            "label": "activeUsers",
+            "label": "remainderReward",
             "offset": 0,
             "slot": "302",
-            "type": "t_array(t_address)dyn_storage",
+            "type": "t_uint256",
             "contract": "ETHPoolUpgradeable",
             "src": "contracts/ETHPoolUpgradeable.sol:34"
           },
           {
-            "label": "balances",
+            "label": "activeUsers",
             "offset": 0,
             "slot": "303",
-            "type": "t_mapping(t_address,t_uint256)",
+            "type": "t_array(t_address)dyn_storage",
             "contract": "ETHPoolUpgradeable",
-            "src": "contracts/ETHPoolUpgradeable.sol:36"
+            "src": "contracts/ETHPoolUpgradeable.sol:37"
           },
           {
-            "label": "activeUsersPosition",
+            "label": "balances",
             "offset": 0,
             "slot": "304",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "ETHPoolUpgradeable",
-            "src": "contracts/ETHPoolUpgradeable.sol:38"
+            "src": "contracts/ETHPoolUpgradeable.sol:39"
+          },
+          {
+            "label": "activeUsersPosition",
+            "offset": 0,
+            "slot": "305",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "ETHPoolUpgradeable",
+            "src": "contracts/ETHPoolUpgradeable.sol:41"
           }
         ],
         "types": {

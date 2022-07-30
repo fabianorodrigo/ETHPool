@@ -138,6 +138,10 @@ describe("ETHPoolUpgradeable", function () {
         expect(await ethPoolProxy.balances(accountC.address)).to.be.equal(
           randomDeposit + randomReward
         );
+        // Remainder reward
+        expect(await ethPoolProxy.remainderReward()).to.be.equal(
+          ethers.constants.Zero
+        );
       });
       it("Should update pool balance and users balance with equal rewards when all active users have deposited the same amount", async function () {
         const {ethPoolProxy, teamMember, accountA, accountB, accountC} =
@@ -175,6 +179,10 @@ describe("ETHPoolUpgradeable", function () {
         );
         expect(await ethPoolProxy.balances(accountA.address)).to.be.equal(
           randomDeposit + Math.floor(randomReward / 3)
+        );
+        // Remainder reward
+        expect(await ethPoolProxy.remainderReward()).to.be.equal(
+          randomReward % 3
         );
       });
       it("Should update pool balance and users balance with proportional rewards when active users have deposited different amounts", async function () {
@@ -223,6 +231,60 @@ describe("ETHPoolUpgradeable", function () {
             Math.floor((randomReward * randomDepositD) / initialPoolBalance)
         );
       });
+      it("Should update keep remainder reward when the remainder division is not exact and distribute it later", async function () {
+        const {ethPoolProxy, teamMember, accountD, accountB, accountC} =
+          await loadFixture(ETHPoolFixture);
+
+        await accountC.sendTransaction({
+          to: ethPoolProxy.address,
+          value: 10,
+        });
+        await accountB.sendTransaction({
+          to: ethPoolProxy.address,
+          value: 26,
+        });
+        await accountD.sendTransaction({
+          to: ethPoolProxy.address,
+          value: 19,
+        });
+
+        const reward = 14;
+        await ethPoolProxy.connect(teamMember).depositReward({
+          value: reward,
+        });
+
+        const initialPoolBalance = 10 + 26 + 19;
+
+        // Pool balance
+        expect(await ethPoolProxy.poolBalance()).to.be.equal(
+          initialPoolBalance + reward
+        );
+        // reward splited
+        expect(await ethPoolProxy.balances(accountC.address)).to.be.equal(12);
+        expect(await ethPoolProxy.balances(accountB.address)).to.be.equal(32);
+        expect(await ethPoolProxy.balances(accountD.address)).to.be.equal(23);
+        // remainder reward
+        expect(await ethPoolProxy.remainderReward()).to.be.equal(2);
+
+        const secondReward = 4;
+        await ethPoolProxy.connect(teamMember).depositReward({
+          value: secondReward,
+        });
+
+        const secondPoolBalance = initialPoolBalance + reward;
+
+        // Pool balance
+        expect(await ethPoolProxy.poolBalance()).to.be.equal(
+          secondPoolBalance + secondReward
+        );
+        // The previous remainder reward must be distributed
+        expect(await ethPoolProxy.balances(accountC.address)).to.be.equal(13);
+        expect(await ethPoolProxy.balances(accountB.address)).to.be.equal(34);
+        expect(await ethPoolProxy.balances(accountD.address)).to.be.equal(25);
+        // remainder reward
+        expect(await ethPoolProxy.remainderReward()).to.be.equal(1);
+      });
+
       it("Should allow any account to send reward after associate it with the TEAM role", async function () {
         const {ethPoolProxy, accountA, accountD, manager, TEAM_ROLE} =
           await loadFixture(ETHPoolFixture);
