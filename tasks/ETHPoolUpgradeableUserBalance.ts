@@ -8,7 +8,7 @@ task(
   .addParam(
     "proxyaddress",
     "The ETHPoolUpgradeable's proxy contract address",
-    "0x30168629686245047e7774F9A190c1824eFD52A0"
+    "0xd201C8566634216B49c2d9668A646DAfc59f21ca"
   )
   .setAction(async (taskArgs, hre) => {
     const ETHPoolUpgradeable = await hre.ethers.getContractFactory(
